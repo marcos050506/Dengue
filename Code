@@ -1,0 +1,82 @@
+
+
+tiene_dengue(Paciente) :-
+sintoma(fiebre_alta),
+ sintoma(dolor_retroocular),
+ sintoma(dolor_muscular_moderado),
+ sintoma(nauseas_o_vomitos),
+ \+ sintoma(dolor_articular_intenso_debilitante),
+ write('DIAGNÓSTICO PROBABLE: DENGUE'), nl.
+
+tiene_chikungunya(Paciente) :-
+ sintoma(fiebre_alta),
+ sintoma(dolor_articular_intenso_debilitante),
+ sintoma(dolor_simetrico_extremidades),
+ sintoma(erupcion_cutanea_temprana),
+ write('DIAGNÓSTICO PROBABLE: CHIKUNGUNYA'), nl.
+
+
+posible_coinfeccion(Paciente) :-
+ sintoma(fiebre_alta),
+ sintoma(dolor_articular_intenso_debilitante),
+ sintoma(dolor_retroocular),
+ sintoma(nauseas_o_vomitos),
+ write('¡ALERTA! Posible COINFECCIÓN Dengue + Chikungunya'), nl,
+ write('→ Acuda inmediatamente a un cuerpo de guardia o al IPK'), nl.
+
+indeterminado(Paciente) :-
+ write('No se puede determinar con claridad solo con síntomas.'), nl,
+ write('→ Recomendado prueba rápida NS1/IgM (dengue) y/o PCR para CHIKV'), nl.
+
+
+tratamiento_dengue :-
+ nl, write('TRATAMIENTO RECOMENDADO PARA DENGUE (MINSAP 2025):'), nl,
+ write('─────────────────────────────────────'), nl,
+ write('• Reposo absoluto en cama'), nl,
+ write('• Hidratación oral abundante (mínimo 2-3 litros/día): agua, suero oral casero o comercial'), nl,
+ write('• Paracetamol (acetaminofén): 500-1000 mg cada 6-8 horas (máx 4 g/día adulto)'), nl,
+ write(' PROHIBIDO: Aspirina, ibuprofeno, diclofenac (aumentan riesgo de sangrado)'), nl,
+ write('• Vigilar signos de alarma: dolor abdominal intenso, sangrado, vómitos persistentes, mareo'), nl,
+ write('→ Si aparecen signos de alarma → IR INMEDIATAMENTE AL HOSPITAL'), nl.
+
+tratamiento_chikungunya :-
+ nl, write('TRATAMIENTO RECOMENDADO PARA CHIKUNGNYA'),nl,
+ write('• Reposo absoluto + aislamiento (usar mosquitero para no contagiar mosquitos'), nl,
+ write('• Hidratación abundante (2-3 litros/día)'), nl,
+ write('• Paracetamol para fiebre'), nl,
+ write('• Para dolor articular intenso: Ibuprofeno 400-600 mg cada 8 h (si no hay contraindicación)'), nl,
+ write('   Diclofenaco 50-75 mg cada 12 h'), nl,
+ write('• En casos severos persistentes: posible indicación de JUZVINZA (CIGB) en hospitales seleccionados'), nl,
+ write('• Fisioterapia una vez pase la fase aguda'), nl.
+
+
+diagnosticar :-
+    limpiar_sintomas,
+    nl, write('DIAGNÓSTICO DIFERENCIAL DENGUE / CHIKUNGUNYA (Cuba 2025)'), nl,
+    write('Responda con "si" o "no" a cada pregunta'), nl, nl,
+
+    preguntar('¿Tiene fiebre alta (>38.5°C) de inicio súbito?', fiebre_alta),
+    preguntar('¿Presenta dolor intenso detrás de los ojos (dolor retroocular)?', dolor_retroocular),
+    preguntar('¿Tiene dolor articular muy intenso que le impide caminar o moverse normalmente?', dolor_articular_intenso_debilitante),
+    preguntar('¿El dolor articular es simétrico y afecta más tobillos, rodillas o muñecas?', dolor_simetrico_extremidades),
+    preguntar('¿Apareció erupción en la piel en las primeras 48 horas?', erupcion_cutanea_temprana),
+    preguntar('¿Tiene náuseas, vómitos o dolor abdominal?', nauseas_o_vomitos),
+    preguntar('¿Tiene dolor muscular generalizado en músculos pero no tan invalidante como el articular?', dolor_muscular_moderado),
+
+    nl, write('═ DIAGNÓSTICO ═'), nl,
+
+    (   tiene_dengue(_) -> tratamiento_dengue
+    ;   tiene_chikungunya(_) -> tratamiento_chikungunya
+    ;   posible_coinfeccion(_) -> tratamiento_dengue, nl, tratamiento_chikungunya
+    ;   indeterminado(_)
+    ),
+
+preguntar(Pregunta, Sintoma) :-
+    nl, write(Pregunta), nl,
+    write('→ '),
+    read(Respuesta),
+    (   Respuesta = si
+    ->  assertz(sintoma(Sintoma))
+    ;   true
+    ).
+ 
